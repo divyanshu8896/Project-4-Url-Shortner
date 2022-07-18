@@ -10,6 +10,12 @@ router.get('/:urlCode', urlController.getURL)
 
 
 
+router.all("/****", function (req, res) {
+    res.status(404).send({
+        status: false,
+        message: "please enter the valid URL"
+    })
+})
 
 
 
