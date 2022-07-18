@@ -1,8 +1,5 @@
 const urlModel = require('../model/urlModel')
-const valid = require('../validation/validation')
 const shortid = require('shortid')
-
-
 
 const baseURL = "localhost:3000/"
 const rexURL = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
@@ -37,13 +34,15 @@ const createShortURL = async function (req, res) {
 
         if (uniqueLongURL) {
 
+
             return res.status(400).send({
                 status: false,
-                message: "you have already shorted this URL"
+                message: "you have already shorted this URL",
+                shortUrl: uniqueLongURL.shortUrl
+
             })
 
         }
-
 
 
         const url = shortid.generate()
