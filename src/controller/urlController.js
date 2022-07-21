@@ -38,9 +38,8 @@ const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 const createShortURL = async function (req, res) {
 
     try {
-        const urlBody = req.body
-        const { longUrl } = urlBody
-
+        const longUrl = req.body.longUrl
+       
         if (!longUrl) {
             return res.status(400).send({
                 status: false,
@@ -55,35 +54,72 @@ const createShortURL = async function (req, res) {
             })
         }
 
+      
+
+        let cachedURLData = await GET_ASYNC(`${req.body.longUrl}`)
+
+        if(cachedURLData) {
+            // return res.redirect(302, cahcedURLData)
+            return res.status(200).send({
+                status: true,
+                data: JSON.parse(cachedURLData)
+            })
+        }else{
+
+              
         const uniqueLongURL = await urlModel.findOne({ longUrl: longUrl })
 
         if (uniqueLongURL) {
+        
+            await SET_ASYNC(`${req.body.longUrl}`, JSON.stringify(uniqueLongURL)) 
 
-            return res.status(400).send({
-                status: false,
+            return res.status(200).send({
+                status: true,
                 message: "you have already shorted this URL",
                 shortUrl: uniqueLongURL.shortUrl
             })
         }
 
-        const url = shortid.generate()
 
-        const uniqueURL = await urlModel.findOne({ urlCode: url })
 
-        if (uniqueURL) {
+            const url = shortid.generate()
 
-            return res.status(400).send({
-                status: false,
-                message: "please enter the valid URL"
+            let obj = {
+
+                urlCode: url,
+                shortUrl: baseURL + url,
+                longUrl: longUrl
+            }
+
+            const data = await urlModel.create(obj)
+
+            await SET_ASYNC(`${req.body.longUrl}`, JSON.stringify(obj)) 
+
+            return res.status(201).send({
+                status: true,
+                data: data
             })
+
+
         }
 
-        let obj = {
 
-            urlCode: url,
-            shortUrl: baseURL + url,
-            longUrl: longUrl
-        }
+        
+
+
+      
+
+        // const uniqueURL = await urlModel.findOne({ urlCode: url })
+
+        // if (uniqueURL) {
+
+        //     return res.status(400).send({
+        //         status: false,
+        //         message: "please hit enter again"
+        //     })
+        // }
+
+     
 
         await urlModel.create(obj)
 
@@ -109,12 +145,12 @@ const getURL = async function (req, res) {
     try {
         const url = req.params.urlCode
 
-        if (!url) {
-            return res.status(400).send({
-                status: false,
-                message: "shortUrl is missing"
-            })
-        }
+        // if (!url) {
+        //     return res.status(400).send({
+        //         status: false,
+        //         message: "shortUrl is missing"
+        //     })
+        // }
 
         if (!shortid.isValid(url)) {
             return res.status(400).send({
@@ -127,7 +163,9 @@ const getURL = async function (req, res) {
         let cahcedURLData = await GET_ASYNC(`${req.params.urlCode}`)
 
         if(cahcedURLData) {
-            return res.redirect(302, cahcedURLData)
+
+            const URLData = JSON.parse(cahcedURLData)
+            return res.redirect(302, URLData.longUrl)
         } else {
           let longUrlData = await urlModel.findOne({ urlCode: url });
 
@@ -138,10 +176,9 @@ const getURL = async function (req, res) {
             })
         }
 
-          await SET_ASYNC(`${req.params.urlCode}`, longUrlData.longUrl)
+          await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(longUrlData) )
           return res.redirect(302, longUrlData.longUrl)
         }
-
 
         
     }
