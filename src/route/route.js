@@ -3,8 +3,9 @@ const router = express.Router()
 const urlController = require('../controller/urlController')
 
 
-// API for create a shot URLs
+// API for create a short URLs
 router.post('/url/shorten', urlController. createShortURL)
+
 
 
 //API for get a original url 
