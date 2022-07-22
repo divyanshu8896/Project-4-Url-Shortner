@@ -3,15 +3,13 @@ const router = express.Router()
 const urlController = require('../controller/urlController')
 
 
-// API for create a short URLs
+// ————————————————————— create a short URLs ——————————————————————//
 router.post('/url/shorten', urlController. createShortURL)
 
-
-
-//API for get a original url 
+// ————————————————————— get a Original URLs ——————————————————————//
 router.get('/:urlCode', urlController.getURL)
 
-//API for Just Check the URL which is  correct or not 
+// ————————————————————— hundled Invalid URLs ———————————————————————//
 router.all("/****", function (req, res) {
     res.status(404).send({
         status: false,

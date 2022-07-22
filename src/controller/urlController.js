@@ -22,7 +22,7 @@ redisClient.auth("yjw5qim7K0AWtzBfzURfNtfi24KzJmx5", function (err) {
 });
 
 redisClient.on("connect", async function () {
-    console.log("Connected to Redis..");
+    console.log("Connected to My Redis..");
 });
 
 
@@ -76,7 +76,7 @@ const createShortURL = async function (req, res) {
 
                 return res.status(200).send({
                     status: true,
-                    message: "you have already shorted this URL",
+                    message: "you have already shorted this URL: shorted URL given below",
                     shortUrl: uniqueLongURL.shortUrl
                 })
             }
