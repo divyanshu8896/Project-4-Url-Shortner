@@ -96,7 +96,7 @@ const createShortURL = async function (req, res) {
 
             return res.status(201).send({
                 status: true,
-                data: data
+                data: obj
             })
         }
     } catch (err) {
